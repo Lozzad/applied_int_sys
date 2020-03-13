@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 40761983}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 158.2, y: 153.2, z: 0}
+  m_LocalPosition: {x: 158.2, y: 153.2, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 519420032}
@@ -496,10 +496,11 @@ MonoBehaviour:
   octaves: 15
   persistance: 0.441
   lacunarity: 1.8
-  seed: 296
+  seed: 282
   offset: {x: 0, y: 0}
-  useFalloff: 0
+  useFalloff: 1
   autoUpdate: 1
+  useSightLines: 1
   regions:
   - name: water
     height: 0
@@ -528,6 +529,8 @@ MonoBehaviour:
   - name: 
     height: 0.94
     colour: {r: 1, g: 1, b: 1, a: 1}
+  display: {fileID: 57407657}
+  mapShader: {fileID: 0}
 --- !u!4 &1594310062
 Transform:
   m_ObjectHideFlags: 0

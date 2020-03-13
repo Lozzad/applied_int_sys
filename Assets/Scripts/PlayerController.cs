@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void PlaceAgent () {
-        SimplePool.Spawn (agentPrefab, gameObject.transform.position, Quaternion.identity);
+        SimplePool.Spawn (agentPrefab, new Vector3 (gameObject.transform.position.x, gameObject.transform.position.y, 0), Quaternion.identity);
     }
 
     private void FixedUpdate () {

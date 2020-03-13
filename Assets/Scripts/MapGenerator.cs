@@ -24,23 +24,29 @@ public class MapGenerator : MonoBehaviour {
 
     public bool useFalloff;
     public bool autoUpdate;
+    public bool useSightLines;
 
     public TerrainType[] regions;
 
     float[, ] falloffMap;
 
     public MapData mapData;
+    public MapDisplay display;
+    public Shader mapShader;
 
     void Awake () {
         falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
+
         instance = this;
-        DrawMapInEditor ();
+        if (useSightLines) {
+            DrawMapSightLines ();
+        } else {
+            DrawMapInEditor ();
+        }
     }
 
     public void DrawMapInEditor () {
         mapData = GenerateMapData (Vector2.zero);
-
-        MapDisplay display = FindObjectOfType<MapDisplay> ();
         display.gameObject.transform.position = new Vector2 (mapWidth / 2, mapHeight / 2);
         if (drawMode == DrawMode.NoiseMap) {
             display.DrawTexture (TextureGenerator.TextureFromHeightMap (mapData.heightMap));
@@ -49,6 +55,13 @@ public class MapGenerator : MonoBehaviour {
         } else if (drawMode == DrawMode.FalloffMap) {
             display.DrawTexture (TextureGenerator.TextureFromHeightMap (FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight)));
         }
+    }
+
+    public void DrawMapSightLines () {
+        mapData = GenerateMapData (Vector2.zero);
+        display.gameObject.transform.position = new Vector2 (mapWidth / 2, mapHeight / 2);
+
+        display.DrawTexture (TextureGenerator.TextureFromColourMap (mapData.colourMap, mapWidth, mapHeight));
     }
 
     void Update () { }
