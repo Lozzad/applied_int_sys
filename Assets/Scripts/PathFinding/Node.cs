@@ -39,6 +39,14 @@ public class Node : IHeapItem<Node> {
         }
     }
 
+    public int GetSlopeFrom (Node startNode) {
+
+        int value = (int) (1000 * Mathf.Abs (height - startNode.height));
+
+        return value;
+
+    }
+
     public int CompareTo (Node nodeToCompare) {
         int compare = fCost.CompareTo (nodeToCompare.fCost);
         if (compare == 0) {
