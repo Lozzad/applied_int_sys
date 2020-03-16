@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
     MapGenerator mapGenerator;
+    MapData mapData;
     private static GameController instance;
     public static GameController Instance {
         get { return instance; }
@@ -11,10 +12,11 @@ public class GameController : MonoBehaviour {
 
     void Awake () {
         instance = this;
+        mapData = FindObjectOfType<MapGenerator> ().GetMapData ();
     }
 
     void Start () {
-        mapGenerator = MapGenerator.instance;
+        //mapGenerator = MapGenerator.instance;
 
     }
 
