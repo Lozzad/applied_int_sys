@@ -1,5 +1,6 @@
 //using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 //TODO: Split it into land and water, then change the types further within that.
@@ -26,7 +27,7 @@ public class MapGenerator : MonoBehaviour {
     public bool autoUpdate;
     public bool useSightLines;
 
-    public TerrainType[] regions;
+    public Region[] regions;
 
     float[, ] falloffMap;
 
@@ -38,33 +39,36 @@ public class MapGenerator : MonoBehaviour {
         falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
 
         instance = this;
-        if (useSightLines) {
-            DrawMapSightLines ();
-        } else {
-            DrawMapInEditor ();
-        }
-    }
-
-    public void DrawMapInEditor () {
         mapData = GenerateMapData (Vector2.zero);
-        display.gameObject.transform.position = new Vector2 (mapWidth / 2, mapHeight / 2);
-        if (drawMode == DrawMode.NoiseMap) {
-            display.DrawTexture (TextureGenerator.TextureFromHeightMap (mapData.heightMap));
-        } else if (drawMode == DrawMode.ColourMap) {
-            display.DrawTexture (TextureGenerator.TextureFromColourMap (mapData.colourMap, mapWidth, mapHeight));
-        } else if (drawMode == DrawMode.FalloffMap) {
-            display.DrawTexture (TextureGenerator.TextureFromHeightMap (FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight)));
+        // DrawMapInEditor ();
+
+    }
+
+    void Start () {
+        var texs = new List<Texture2D> ();
+        foreach (var t in regions) {
+            texs.Add (TextureGenerator.TextureFromColourMap (t.colourMap, mapWidth, mapHeight));
         }
+
+        display.DrawTexture (texs);
     }
 
-    public void DrawMapSightLines () {
-        mapData = GenerateMapData (Vector2.zero);
-        display.gameObject.transform.position = new Vector2 (mapWidth / 2, mapHeight / 2);
+    // public void DrawMapInEditor () {
+    //     mapData = GenerateMapData (Vector2.zero);
+    //     display.gameObject.transform.position = new Vector2 (mapWidth / 2, mapHeight / 2);
+    //     if (drawMode == DrawMode.NoiseMap) {
+    //         display.DrawTexture (new List<Texture2D> (1) { TextureGenerator.TextureFromHeightMap (mapData.heightMap) });
+    //     } else if (drawMode == DrawMode.ColourMap) {
+    //         var texs = new List<Texture2D> ();
+    //         foreach (var t in regions) {
+    //             texs.Add (TextureGenerator.TextureFromColourMap (t.colourMap, mapWidth, mapHeight));
+    //         }
 
-        display.DrawTexture (TextureGenerator.TextureFromColourMap (mapData.colourMap, mapWidth, mapHeight));
-    }
-
-    void Update () { }
+    //         display.DrawTexture (texs);
+    //     } else if (drawMode == DrawMode.FalloffMap) {
+    //         display.DrawTexture (new List<Texture2D> (1) { TextureGenerator.TextureFromHeightMap (FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight)) });
+    //     }
+    // }
 
     MapData GenerateMapData (Vector2 centre) {
         //generate the noisemap
@@ -83,13 +87,16 @@ public class MapGenerator : MonoBehaviour {
         //noiseMap = RandomSample (noiseMap, 10);
 
         //create the colourmap
-        Color[] colourMap = new Color[mapWidth * mapHeight];
+        for (int i = 0; i < regions.Length; i++) {
+            regions[i].colourMap = new Color[mapWidth * mapHeight];
+        }
+
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++) {
                     if (currentHeight >= regions[i].height) {
-                        colourMap[y * mapWidth + x] = regions[i].colour;
+                        regions[i].colourMap[y * mapWidth + x] = regions[i].tint;
                     } else {
                         break;
                     }
@@ -99,7 +106,7 @@ public class MapGenerator : MonoBehaviour {
 
         float[, ] trailMap = TrailMapGenerator.GenerateTrailMap (mapWidth, mapHeight);
 
-        return new MapData (noiseMap, colourMap, trailMap);
+        return new MapData (noiseMap, regions, trailMap);
     }
 
     float[, ] RandomSample (float[, ] map, int numSamples) {
@@ -130,23 +137,28 @@ public class MapGenerator : MonoBehaviour {
 
         falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
     }
+
+    public MapData GetMapData () {
+        return mapData;
+    }
 }
 
 [System.Serializable]
-public struct TerrainType {
+public struct Region {
     public string name;
     public float height;
-    public Color colour;
+    public Color tint;
+    public Color[] colourMap;
 }
 
 public struct MapData {
     public readonly float[, ] heightMap;
-    public readonly Color[] colourMap;
+    public readonly Region[] regions;
     public float[, ] trailMap;
 
-    public MapData (float[, ] heightMap, Color[] colourMap, float[, ] trailMap) {
+    public MapData (float[, ] heightMap, Region[] regions, float[, ] trailMap) {
         this.heightMap = heightMap;
-        this.colourMap = colourMap;
+        this.regions = regions;
         this.trailMap = trailMap;
     }
 }
