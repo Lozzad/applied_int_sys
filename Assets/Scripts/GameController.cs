@@ -12,12 +12,12 @@ public class GameController : MonoBehaviour {
 
     void Awake () {
         instance = this;
-        mapData = FindObjectOfType<MapGenerator> ().GetMapData ();
+        mapGenerator = FindObjectOfType<MapGenerator> ();
     }
 
     void Start () {
         //mapGenerator = MapGenerator.instance;
-
+        mapData = mapGenerator.GetMapData ();
     }
 
     void Update () {

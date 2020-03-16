@@ -33,7 +33,6 @@ public class MapGenerator : MonoBehaviour {
 
     public MapData mapData;
     public MapDisplay display;
-    public Shader mapShader;
 
     void Awake () {
         falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
@@ -50,7 +49,7 @@ public class MapGenerator : MonoBehaviour {
             texs.Add (TextureGenerator.TextureFromColourMap (t.colourMap, mapWidth, mapHeight));
         }
 
-        display.DrawTexture (texs);
+        display.DrawTexture (texs, mapWidth, mapHeight);
     }
 
     // public void DrawMapInEditor () {
