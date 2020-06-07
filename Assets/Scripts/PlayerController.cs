@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-    Rigidbody2D body;
+
     MapGenerator map;
     SpriteRenderer spriteRenderer;
     public GameObject agentPrefab;
@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour {
     public Vector2 worldPos;
 
     void Awake () {
-        body = GetComponent<Rigidbody2D> ();
         spriteRenderer = GetComponentInChildren<SpriteRenderer> ();
     }
 
@@ -53,7 +52,7 @@ public class PlayerController : MonoBehaviour {
 
     private void FixedUpdate () {
 
-        body.velocity = new Vector2 (horizontal * movSpd, vertical * movSpd);
+        transform.position += new Vector3 (horizontal, vertical, 0);
 
     }
 

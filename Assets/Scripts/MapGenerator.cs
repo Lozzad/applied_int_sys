@@ -28,6 +28,7 @@ public class MapGenerator : MonoBehaviour {
     public bool useSightLines;
 
     public Region[] regions;
+    Color[] colourMap;
 
     float[, ] falloffMap;
 
@@ -36,7 +37,7 @@ public class MapGenerator : MonoBehaviour {
 
     void Awake () {
         falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
-
+        display = GetComponent<MapDisplay> ();
         instance = this;
         mapData = GenerateMapData (Vector2.zero);
         // DrawMapInEditor ();
@@ -44,12 +45,9 @@ public class MapGenerator : MonoBehaviour {
     }
 
     void Start () {
-        var texs = new List<Texture2D> ();
-        foreach (var t in regions) {
-            texs.Add (TextureGenerator.TextureFromColourMap (t.colourMap, mapWidth, mapHeight));
-        }
+        var tex = TextureGenerator.TextureFromColourMap (colourMap, mapWidth, mapHeight);
 
-        display.DrawTexture (texs, mapWidth, mapHeight);
+        display.DrawTexture (tex);
     }
 
     // public void DrawMapInEditor () {
@@ -86,16 +84,15 @@ public class MapGenerator : MonoBehaviour {
         //noiseMap = RandomSample (noiseMap, 10);
 
         //create the colourmap
-        for (int i = 0; i < regions.Length; i++) {
-            regions[i].colourMap = new Color[mapWidth * mapHeight];
-        }
+
+        colourMap = new Color[mapWidth * mapHeight];
 
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++) {
                     if (currentHeight >= regions[i].height) {
-                        regions[i].colourMap[y * mapWidth + x] = regions[i].tint;
+                        colourMap[y * mapWidth + x] = regions[i].tint;
                     } else {
                         break;
                     }
@@ -126,16 +123,16 @@ public class MapGenerator : MonoBehaviour {
         return map;
     }
 
-    void OnValidate () {
-        if (lacunarity < 1) {
-            lacunarity = 1;
-        }
-        if (octaves < 0) {
-            octaves = 0;
-        }
+    // void OnValidate () {
+    //     if (lacunarity < 1) {
+    //         lacunarity = 1;
+    //     }
+    //     if (octaves < 0) {
+    //         octaves = 0;
+    //     }
 
-        falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
-    }
+    //     falloffMap = FalloffGenerator.GenerateFalloffMap (mapWidth, mapHeight);
+    // }
 
     public MapData GetMapData () {
         return mapData;
@@ -147,7 +144,6 @@ public struct Region {
     public string name;
     public float height;
     public Color tint;
-    public Color[] colourMap;
 }
 
 public struct MapData {
